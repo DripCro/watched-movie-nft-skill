@@ -1,4 +1,4 @@
-// Compile WatchedMovies.sol and print the CREATE2 deploy payload.
+// Compile WatchedMovies.sol (v2, $0.05 mint fee) and print the CREATE2 deploy payload.
 // Run in Bankr sandbox: packages = ["solc@0.8.28", "@openzeppelin/contracts@5.1.0", "viem@2.21.0"]
 // Usage: bun scripts/compile.js <ownerAddress>
 const solc = require('solc');
@@ -34,7 +34,8 @@ const c = out.contracts['WatchedMovies.sol']['WatchedMovies'];
 const bytecode = '0x' + c.evm.bytecode.object;
 const ctorArgs = encodeAbiParameters([{ type: 'address' }], [owner]);
 const initcode = concat([bytecode, ctorArgs]);
-const salt = keccak256(toHex('watched-movies-v1-' + owner.toLowerCase()));
+// v2 salt — fee-enabled contract deploys to a fresh address per owner
+const salt = keccak256(toHex('watched-movies-v2-' + owner.toLowerCase()));
 const deployer = '0x4e59b44847b379578588920cA78FbF26c0B4956C';
 const predicted = getContractAddress({ from: deployer, opcode: 'CREATE2', salt, bytecode: initcode });
 const payload = concat([salt, initcode]);
